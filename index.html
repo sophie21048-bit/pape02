@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для папы — С днём рождения!</title>
+    <style>
+        :root {
+            --wine: #5c1d24;       /* Приглушенный винный */
+            --burgundy: #80232c;   /* Приглушенный бордовый */
+            --peach: #f5d6c6;      /* Нежный приглушенный персиковый */
+            --peach-dark: #e6bda8; /* Более темный персиковый для акцентов */
+            --bg: #faf6f5;         /* Светлый кремовый фон */
+            --text: #2c1a1c;       /* Темный текст */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Экраны сайта */
+        .screen {
+            display: none;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* СТРАНИЦА 1: ОБЛОЖКА */
+        #screen1 {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, var(--wine), var(--burgundy));
+            color: var(--peach);
+            padding: 40px 20px;
+        }
+
+        .welcome-box {
+            max-width: 600px;
+            padding: 40px 30px;
+            border: 2px solid var(--peach);
+            border-radius: 20px;
+            background: rgba(44, 13, 17, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .welcome-box h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .welcome-box p {
+            font-size: 1.2rem;
+            margin-bottom: 35px;
+            opacity: 0.9;
+        }
+
+        .start-btn {
+            display: inline-block;
+            background-color: var(--peach);
+            color: var(--wine);
+            padding: 16px 40px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            background-color: var(--peach-dark);
+        }
+
+        /* СТРАНИЦА 2: ПОЗДРАВЛЕНИЯ */
+        #screen2 {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--peach);
+        }
+
+        header h2 {
+            font-size: 2rem;
+            color: var(--wine);
+        }
+
+        /* Сетка по 4 карточки в ряд */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            padding: 10px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(128, 35, 44, 0.06);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            border: 1px solid rgba(230, 189, 168, 0.4);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(128, 35, 44, 0.15);
+        }
+
+        .card-image-wrapper {
+            width: 100%;
+            height: 240px;
+            overflow: hidden;
+            background-color: var(--peach);
+            position: relative;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover img {
+            transform: scale(1.05);
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--wine);
+            color: var(--peach);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .card-info {
+            padding: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--wine);
+            background: #ffffff;
+            min-height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Модальное окно (Попап с пожеланием) */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(44, 26, 28, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            border: 3px solid var(--peach);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--burgundy);
+        }
+
+        .modal-text {
+            font-size: 1.25rem;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* Адаптивность для экранов iPad и телефонов */
+        @media (max-width: 1024px) {
+            .grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: repeat(2, 1fr); }
+            .welcome-box h1 { font-size: 2rem; }
+        }
+        @media (max-width: 480px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- СТРАНИЦА 1: ОБЛОЖКА САЙТА -->
+    <div class="screen active" id="screen1">
+        <div class="welcome-box">
+            <h1>Дорогому Папе</h1>
+            <p>Олег, этот сайт — коробочка с нашими самыми теплыми воспоминаниями и важными пожеланиями для тебя.</p>
+            <button class="start-btn" onclick="openWishes()">Открыть поздравление</button>
+        </div>
+    </div>
+
+    <!-- СТРАНИЦА 2: СЕТКА КАРТОЧЕК -->
+    <div class="screen" id="screen2">
+        <header>
+            <h2>С днём рождения!</h2>
+        </header>
+
+        <div class="grid" id="wishesGrid">
+            <!-- Карточки создаются автоматически скриптом ниже -->
+        </div>
+    </div>
+
+    <!-- Окно для вывода скрытого пожелания -->
+    <div class="modal" id="wishModal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeModal">&times;</button>
+            <div class="modal-text" id="modalText">Текст поздравления...</div>
+        </div>
+    </div>
+
+    <script>
+        // Функция переключения страниц по кнопке
+        function openWishes() {
+            document.getElementById('screen1').classList.remove('active');
+            document.getElementById('screen2').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // Данные 16 карточек
+        const wishesData = [
+            {
+                img: "photo1",
+                title: "Здоровья",
+                wish: "Пусть здоровья хватает на всё, что тебе хочется делать, а каждый новый день приносит спокойствие и силы."
+            },
+            {
+                img: "photo2",
+                title: "Финансового благополучия",
+                wish: "Желаю тебе достатка, финансовой уверенности и возможностей воплощать все свои мечты."
+            },
+            {
+                img: "photo3",
+                title: "Радости",
+                wish: "Желаю замечать больше хорошего в обычных днях и находить поводы улыбаться даже тогда, когда день начинается совсем обычно."
+            },
+            {
+                img: "photo4",
+                title: "Спокойствия",
+                wish: "Пусть в жизни будет больше тихих вечеров, приятных разговоров и ощущения, что всё самое важное находится рядом."
+            },
+            {
+                img: "photo5",
+                title: "Удачи",
+                wish: "Желаю, чтобы нужные возможности появлялись вовремя, решения давались легко, а задуманное постепенно становилось реальностью."
+            },
+            {
+                img: "photo6",
+                title: "Хороших людей",
+                wish: "Пусть рядом встречаются надёжные, добрые и искренние люди, с которыми легко строить планы и приятно проводить время."
+            },
+            {
+                img: "photo7",
+                title: "Больше поводов для гордости",
+                wish: "Пусть рядом встречаются надёжные, добрые и искренние люди, с которыми легко строить планы и приятно проводить время."
+            },
+            {
+                img: "photo8",
+                title: "Тепла и уюта",
+                wish: "Желаю возвращаться домой с ощущением тепла и знать, что здесь тебя любят, ждут и всегда рады тебе."
+            },
+            {
